@@ -1,0 +1,15 @@
+# Unreal Engine
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+.vs/
+
+# Mac
+.DS_Store
+
+# Logs
+*.log
+
+# Build
+Build/
