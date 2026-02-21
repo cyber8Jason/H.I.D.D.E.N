@@ -63,22 +63,16 @@ Important:
 - Never move/rename Unreal assets in Finder/Explorer
 - Always create/move/rename assets inside Unreal Editor
 
----
-
 ### 3. Check Changes
 ```bash
 git status
 ```
-
----
 
 ### 4. Commit Changes (Small Commits Preferred)
 ```bash
 git add .
 git commit -m "Short description of the change"
 ```
-
----
 
 ### 5. Push the Branch
 First push:
@@ -91,20 +85,14 @@ Subsequent pushes:
 git push
 ```
 
----
-
 ### 6. Open a Pull Request
 - Base branch: `main`
 - Compare branch: `feature/<name>`
 - Assign the other developer as reviewer
 
----
-
 ### 7. Review & Merge
 - Reviewer approves
 - Merge into `main`
-
----
 
 ### 8. Cleanup After Merge
 ```bash
