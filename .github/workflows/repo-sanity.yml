@@ -1,0 +1,63 @@
+name: Repo Sanity
+
+on:
+  pull_request:
+  push:
+    branches: [main, develop]
+
+jobs:
+  sanity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check branch naming
+        if: github.event_name == 'pull_request'
+        run: |
+          set -e
+          branch="${GITHUB_HEAD_REF}"
+
+          if [ -z "$branch" ]; then
+            echo "❌ Could not detect branch name."
+            exit 1
+          fi
+
+          if echo "$branch" | grep -Eq '^(feat|fix|chore|refactor|docs|test)/'; then
+            echo "✅ Prefix ok: $branch"
+          else
+            echo "❌ Branch name must start with feat/, fix/, chore/, refactor/, docs/ or test/"
+            echo "Got: $branch"
+            exit 1
+          fi
+
+      - name: Fail if forbidden UE folders are tracked
+        run: |
+          set -e
+          forbidden_regex='^(Binaries/|DerivedDataCache/|Intermediate/|Saved/)'
+          if git ls-files | grep -E "$forbidden_regex" >/dev/null; then
+            echo "❌ Forbidden UE build/cache folders are tracked (Binaries/Intermediate/Saved/DerivedDataCache)."
+            echo "Remove them from git and add them to .gitignore."
+            git ls-files | grep -E "$forbidden_regex"
+            exit 1
+          fi
+          echo "✅ No forbidden folders tracked."
+
+      - name: Check that a .uproject exists
+        run: |
+          set -e
+          count=$(ls -1 *.uproject 2>/dev/null | wc -l)
+          if [ "$count" -eq 0 ]; then
+            echo "❌ No .uproject found at repository root."
+            exit 1
+          fi
+          echo "✅ Found .uproject."
+
+      - name: Basic line endings check (avoid CRLF explosions)
+        run: |
+          set -e
+          # Show (but don't fail) if there are CRLF in .ini/.uproject (optional)
+          if git grep -Il $'\r' -- '*.ini' '*.uproject' 2>/dev/null; then
+            echo "⚠️ CRLF detected in config/project files. Consider normalizing to LF."
+          else
+            echo "✅ No CRLF detected in .ini/.uproject."
+          fi
